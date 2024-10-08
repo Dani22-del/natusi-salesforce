@@ -1,0 +1,168 @@
+<div class="modal fade" id="addGudang" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-simple modal-add-new-address modal-dialog-centered">
+        <div class="modal-content p-md-5 p-3">
+            <div class="modal-body p-md-0">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="mb-4 text-center">
+                    <h3 class="address-title mb-2 pb-1">Tambah / Edit Gudang</h3>
+                    <p class="address-subtitle">Isi dengan lengkap form dibawah ini</p>
+                </div>
+                <form class="row g-4 form-save" onsubmit="return false">
+                    <input type="hidden" value="{{ $data ? $data->id_master_gudang : null }}" name="id">
+                    <div class="col-4">
+                        <div class="form-floating form-floating-outline">
+                            <div class="form-floating form-floating-outline">
+                                <input type="text" id="kode_gudang" name="kode_gudang"
+                                    value="{{ $data ? $data->kode_gudang : null }}" class="form-control"
+                                    placeholder="Kode Gudang" />
+                                <label for="modalAddressAddress1">Kode Gudang *</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-8">
+                        <div class="form-floating form-floating-outline">
+                            <input type="text" id="nama_gudang" name="nama_gudang"
+                                value="{{ $data ? $data->nama_gudang : null }}" class="form-control"
+                                placeholder="Nama Gudang" />
+                            <label for="modalAddressAddress1">Nama Gudang *</label>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-floating form-floating-outline">
+                            <input type="text" id="username" name="username"
+                                value="{{ $data ? $data->users->name : null }}" class="form-control"
+                                placeholder="Username" />
+                            <label for="modalAddressAddress1">Username *</label>
+                        </div>
+                    </div>
+                    <div class="col-6 form-password-toggle mb-3">
+                        <div class="input-group input-group-merge">
+                            <div class="form-floating form-floating-outline">
+                                <input type="password" id="password" class="form-control" name="password"
+                                    placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"
+                                    aria-describedby="password" />
+                                <label for="password">Password</label>
+                            </div>
+                            <span class="input-group-text cursor-pointer"><i class="mdi mdi-eye-off-outline"></i></span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-floating form-floating-outline">
+                            <input type="email" id="email" name="email"
+                                value="{{ $data ? $data->users->email : null }}" class="form-control"
+                                placeholder="Alamat Email" />
+                            <label for="email">Email *</label>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-floating form-floating-outline">
+                            <input type="number" id="telepon" name="telepon"
+                                value="{{ $data ? $data->telepon : null }}" class="form-control" placeholder="Nama" />
+                            <label for="modalAddressAddress1">Telepon *</label>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="form-floating form-floating-outline">
+                            <input type="text" id="alamat_gudang" name="alamat_gudang"
+                                value="{{ $data ? $data->alamat_gudang : null }}" class="form-control"
+                                placeholder="Alamat Gudang" />
+                            <label for="modalAddressAddress1">Alamat Gudang *</label>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-floating form-floating-outline">
+                            <input type="number" id="telepon" name="telepon"
+                                value="{{ $data ? $data->telepon : null }}" class="form-control" placeholder="Nama" />
+                            <label for="modalAddressAddress1">Telepon *</label>
+                        </div>
+                    </div>
+                    <div class="col-12 text-end">
+                        <button type="reset" class="btn btn-outline-secondary" data-bs-dismiss="modal"
+                            aria-label="Close"><i class="mdi mdi-keyboard-return me-1"></i> Cancel</button>
+                        <button type="button" class="btn btn-success me-sm-3 btn-submit me-1"><i
+                                class="mdi mdi-check-all me-1"></i>Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $('.btn-submit').click(function(e) {
+        e.preventDefault();
+        // $('.btn-submit').html('Please wait...').attr('disabled', true);
+        $('.btn-submit');
+        var data = new FormData($('.form-save')[0]);
+        $.ajax({
+            url: "{{ route('store-gudang') }}",
+            type: 'POST',
+            data: data,
+            async: true,
+            cache: false,
+            contentType: false,
+            processData: false
+        }).done(function(data) {
+            $('.form-save').validate(data, 'has-error');
+            if (data.status == 'success') {
+                toastr.success(data.message);
+                $('#addGudang').modal('hide'); // Show the modal
+                $('.main-page').show();
+                $('#datagrid').DataTable().ajax.reload();
+                // $('#addPrinciple').fadeOut(function(){
+                // $('#addPrinciple').empty();
+                // $('.add-principle-page').fadeIn();
+                // $('#datagrid').DataTable().ajax.reload();
+                // });
+            } else if (data.status == 'error') {
+                $('.btn-submit');
+                Lobibox.notify('error', {
+                    pauseDelayOnHover: true,
+                    size: 'mini',
+                    rounded: true,
+                    delayIndicator: false,
+                    icon: 'bx bx-x-circle',
+                    continueDelayOnInactiveTab: false,
+                    position: 'top right',
+                    sound: false,
+                    msg: data.message
+                });
+                swal('Error :' + data.errMsg.errorInfo[0], data.errMsg.errorInfo[2], 'warning');
+            } else {
+                var n = 0;
+                for (key in data) {
+                    if (n == 0) {
+                        var dt0 = key;
+                    }
+                    n++;
+                }
+                $('.btn-submit');
+                Lobibox.notify('warning', {
+                    pauseDelayOnHover: true,
+                    size: 'mini',
+                    rounded: true,
+                    delayIndicator: false,
+                    icon: 'bx bx-error',
+                    continueDelayOnInactiveTab: false,
+                    position: 'top right',
+                    sound: false,
+                    msg: data.message
+                });
+            }
+        }).fail(function() {
+            $('.btn-submit');
+            Lobibox.notify('warning', {
+                title: 'Maaf!',
+                pauseDelayOnHover: true,
+                size: 'mini',
+                rounded: true,
+                delayIndicator: false,
+                icon: 'bx bx-error',
+                continueDelayOnInactiveTab: false,
+                position: 'top right',
+                sound: false,
+                msg: 'Terjadi Kesalahan, Silahkan Ulangi Kembali atau Hubungi Tim IT !!'
+            });
+        });
+    });
+</script>
