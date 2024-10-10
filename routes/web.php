@@ -25,9 +25,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\EnsureTokenIsValid;
 use GuzzleHttp\Middleware;
 
-Route::group(['prefix' => 'mid' , 'middleware' => EnsureTokenIsValid::class], function() {
-    Route::get('/',function (){
-       return 'welcome';
+Route::group(['prefix' => 'mid', 'middleware' => EnsureTokenIsValid::class], function () {
+    Route::get('/', function () {
+        return 'welcome';
     });
 });
 
@@ -52,10 +52,14 @@ Route::group(['middleware' => 'auth'], function () {
             Route::get('/', [SalesOrderController::class, 'index'])->name('sales-order');
             Route::post('/store-sales-order', [SalesOrderController::class, 'store'])->name('store-so');
             Route::post('/delete-sales-order', [SalesOrderController::class, 'destroy'])->name('destroy-so');
+            Route::post('/update-status-sales/{id}', [SalesOrderController::class, 'updateStatus'])->name('update-status');
             Route::post('/sales-order/add-sales', [SalesOrderController::class, 'createSales'])->name('form-add-sales');
             Route::post('/sales-order/detail-sales', [SalesOrderController::class, 'detailSales'])->name(
                 'form-detail-sales-order'
             );
+            Route::post('/delete-order-item', [SalesOrderController::class, 'destroyOrderItem'])->name('destroy-order-item');
+            Route::post('/sales/sales-order/item-details', [SalesOrderController::class, 'getOrderItemDetails'])->name('get-order-item-details');
+            Route::post('/sales/sales-order/update-item', [SalesOrderController::class, 'updateOrderItem'])->name('update-order-item');
         });
         Route::group(['prefix' => 'data-sales'], function () {
             Route::get('/', [DataSalesController::class, 'index'])->name('data-sales');
@@ -76,7 +80,6 @@ Route::group(['middleware' => 'auth'], function () {
             );
             Route::post('/schedule/store-schedule', [ScheduleController::class, 'store'])->name('store-schedule-sales');
             Route::post('/schedule/delete-schedule-sales', [ScheduleController::class, 'destroy'])->name('destroy-schedule-sales');
-
         });
         Route::group(['prefix' => 'tracking'], function () {
             Route::get('/', [TrackingController::class, 'index'])->name('tracking');
@@ -119,6 +122,7 @@ Route::group(['middleware' => 'auth'], function () {
         });
         Route::group(['prefix' => 'pembayaran'], function () {
             Route::get('/', [PembayaranController::class, 'index'])->name('pembayaran');
+            Route::post('/add-pembayaran', [PembayaranController::class, 'createPembayaran'])->name('form-add-pembayaran');
         });
     });
 
@@ -198,4 +202,3 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('/', [DataReturController::class, 'index'])->name('data-retur');
     });
 });
-

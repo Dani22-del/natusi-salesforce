@@ -32,9 +32,6 @@ class SalesOrderController extends Controller
                       <a class="dropdown-item waves-effect" href="javascript:void(0);" onclick="detailSales(' . $row->id . ')">
                           <i class="ri-zoom-in-line"></i> Detail
                       </a>
-                      <a class="dropdown-item waves-effect" href="javascript:void(0);" onclick="editForm(' . $row->id . ')">
-                          <i class="ri-pencil-line me-1"></i> Edit
-                      </a>
                       <a class="dropdown-item waves-effect" href="javascript:void(0);" onclick="deleteForm(' . $row->id . ')">
                           <i class="ri-delete-bin-7-line me-1"></i> Delete
                       </a>
@@ -136,22 +133,57 @@ class SalesOrderController extends Controller
     }
 
 
-
-
-
-
     private function calculateSubtotal($harga, $qty, $discount)
     {
         $discountAmount = ($harga * $qty * $discount) / 100;
         return ($harga * $qty) - $discountAmount;
     }
 
+    public function updateStatus(Request $request, $id)
+    {
+        try {
+            $salesOrder = SalesOrder::findOrFail($id);
+
+            if ($salesOrder->status_approve !== 'Pending') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Sales Order sudah diupdate sebelumnya.'
+                ], 400);
+            }
+
+            if ($request->action === 'accept') {
+                $salesOrder->status_approve = 'Dikirim';
+            } elseif ($request->action === 'reject') {
+                $salesOrder->status_approve = 'Ditolak';
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Aksi tidak valid.'
+                ], 400);
+            }
+
+            $salesOrder->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Status Sales Order berhasil diperbarui.',
+                'new_status' => $salesOrder->status_approve
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+
     public function detailSales(Request $request)
     {
         $salesOrder = SalesOrder::with(['sales', 'customer', 'items.produk'])->find($request->id);
 
-        $totalHarga = $salesOrder->items->sum(function($item) {
-            return $item->subtotal; 
+        $totalHarga = $salesOrder->items->sum(function ($item) {
+            return $item->subtotal;
         });
 
         $data = [
@@ -162,6 +194,43 @@ class SalesOrderController extends Controller
         $content = view('sales.sales_order.detail-sales', $data)->render();
         return ['status' => 'success', 'content' => $content, 'data' => $data];
     }
+
+    public function getOrderItemDetails(Request $request)
+    {
+        $orderItem = SalesOrderItem::with('produk')->find($request->id);
+
+        if ($orderItem) {
+            return response()->json($orderItem);
+        }
+        return response()->json(['error' => 'Order item not found'], 404);
+    }
+
+    public function updateOrderItem(Request $request)
+    {
+        $orderItem = SalesOrderItem::find($request->id);
+
+        if ($orderItem) {
+            $orderItem->qty = $request->qty;
+            $orderItem->discount = $request->diskon;
+            $orderItem->subtotal = $request->sub_total;
+            $orderItem->save();
+
+            $masterSoId = $orderItem->salesOrder->id;
+            $totalInvoice = SalesOrderItem::where('sales_order_id', $masterSoId)->sum('subtotal');
+
+            $masterSo = SalesOrder::find($masterSoId);
+            if ($masterSo) {
+                $masterSo->total_invoice = $totalInvoice;
+                $masterSo->save();
+            }
+
+            return response()->json(['success' => true, 'message' => 'Order item updated successfully', 'total_invoice' => $totalInvoice]);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Order item not found']);
+    }
+
+
 
 
     /**
@@ -187,6 +256,50 @@ class SalesOrderController extends Controller
     {
         try {
             $user = SalesOrder::find($request->id);
+
+            if (!$user) {
+                return response()->json(
+                    [
+                        'metaData' => [
+                            'status' => 404,
+                            'success' => false,
+                            'message' => 'Data not found'
+                        ]
+                    ],
+                    404
+                );
+            }
+
+            $user->delete();
+
+            return response()->json([
+                'metaData' => [
+                    'status' => 200,
+                    'success' => true,
+                    'message' => 'Data berhasil dihapus'
+                ]
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json(
+                [
+                    'metaData' => [
+                        'status' => 500,
+                        'success' => false,
+                        'message' => 'Terjadi kesalahan, silahkan coba lagi'
+                    ],
+                    'response' => [
+                        'error' => $e->getMessage()
+                    ]
+                ],
+                500
+            );
+        }
+    }
+
+    public function destroyOrderItem(Request $request)
+    {
+        try {
+            $user = SalesOrderItem::find($request->id);
 
             if (!$user) {
                 return response()->json(

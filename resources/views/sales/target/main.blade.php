@@ -18,28 +18,14 @@
                         </div>
                     </div>
                 </div>
-                <table class="dt-column-search table-bordered table">
-                    {{-- <thead>
-          <tr>
-            <th>Kode Toko</th>
-            <th>Nama Toko</th>
-            <th>Nama Sales</th>
-            <th>Tgl.Order</th>
-            <th>No.Inv</th>
-            <th>Tgl.Kirim</th>
-            <th>Nama Driver</th>
-            <th>Status</th>
-            <th>Aksi</th>
-          </tr>
-        </thead> --}}
+                <table class="datatables-users table" id="datagrid" style="width:100%">
                     <thead>
                         <tr>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Post</th>
-                            <th>City</th>
-                            <th>Date</th>
-                            <th>Salary</th>
+                            <th>Kode</th>
+                            <th>Nama Sales</th>
+                            <th>Bulan Tahun</th>
+                            <th>Target</th>
+                            <th>Aksi</th>
                         </tr>
                     </thead>
                 </table>
@@ -50,6 +36,57 @@
 @endsection
 
 @section('js')
+    <script>
+        $(function() {
+            var table = $('#datagrid').DataTable({
+                processing: true,
+                serverSide: true,
+                // bDestroy: true,
+                language: {
+                    searchPlaceholder: "Ketikkan yang dicari"
+                },
+                ajax: "{{ route('data-target') }}",
+
+                columns: [
+                    {
+                        data: 'sales',
+                        name: 'kode_sales',
+                        render: function(data, type, row) {
+                            return '<p style="color:black">' + data.kode_sales + '</p>';
+                        }
+                    },
+                    {
+                        data: 'sales',
+                        name: 'nama_lengkap',
+                        render: function(data, type, row) {
+                            return '<p style="color:black">' + data.nama_lengkap + '</p>';
+                        }
+                    },
+                    {
+                        data: 'bulan',
+                        name: 'bulan',
+                        render: function(data, type, row) {
+                            return '<p style="color:black">' + data + '</p>';
+                        }
+                    },
+                    {
+                        data: 'target',
+                        name: 'target',
+                        render: function(data, type, row) {
+                            return '<p style="color:black">' + data + '</p>';
+                        }
+                    },
+                    {
+                        data: 'action',
+                        name: 'action',
+                        orderable: false,
+                        searchable: false
+                    },
+                ]
+            });
+        });
+    </script>
+
     <script>
         function addSales() {
             $.post("{!! route('form-add-data-target') !!}").done(function(data) {

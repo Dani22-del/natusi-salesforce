@@ -13,6 +13,8 @@
             <div class="card-datatable text-nowrap p-3">
                 <div class="col-lg-3 col-sm-6 col-12 mb-4">
                     <div class="demo-inline-spacing">
+                        <button type="button" onclick="addPembayaran()" class="btn btn-primary"><i
+                            class="mdi mdi-plus-box-multiple-outline me-1"></i> Tambah Baru</button>
                         <button type="button" onclick="detailStock()" class="btn btn-sm btn-warning"><i
                                 class="mdi mdi-import me-1"></i> Import</button>
                         <button type="button" onclick="detailStock()" class="btn btn-sm btn-secondary"><i
@@ -21,7 +23,7 @@
                                 class="mdi mdi-delete me-1"></i> Hapus Semua</button>
                     </div>
                 </div>
-                <table class="datatables-users table" id="datagrid" style="width:100%">
+                <table class="table-bordered table" id="datagrid" style="width:100%">
                     <thead>
                         <tr>
                             <th>No</th>
@@ -41,11 +43,26 @@
                 </table>
             </div>
         </div>
-        <div class="add-piutang-page"></div>
+        <div class="add-pembayaran-page"></div>
         <div class="detail-produk-page"></div>
     </div>
 @endsection
 
 @section('js')
-
+    <script>
+        
+    </script>
+    <script>
+        function addPembayaran() {
+            $.post("{!! route('form-add-pembayaran') !!}").done(function(data) {
+                if (data.status == 'success') {
+                    $('.add-pembayaran-page').html('');
+                    $('.add-pembayaran-page').html(data.content).fadeIn();
+                    $('#addPembayaran').modal('show'); // Show the modal
+                } else {
+                    $('.main-page').show();
+                }
+            });
+        }
+    </script>
 @endsection

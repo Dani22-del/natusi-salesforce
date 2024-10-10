@@ -1,4 +1,4 @@
-<div class="card p-3">
+<div class="card p-3" id="addSalesOrder">
     <div class="card-header d-flex align-items-center justify-content-between">
         <h5 class="mb-0">Sales Order</h5>
     </div>
@@ -330,6 +330,9 @@
                         cart = [];
                         $('#cart-items').empty();
                         calculateTotal();
+                        $('#addSalesOrder').hide(); // Show the modal
+                        $('.main-page').show();
+                        $('#datagrid').DataTable().ajax.reload();
                     } else {
                         alert('Gagal menyimpan data: ' + response.message);
                     }
