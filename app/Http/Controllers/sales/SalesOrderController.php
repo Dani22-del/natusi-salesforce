@@ -7,6 +7,7 @@ use App\Models\DataMaster\MasterCustomer;
 use App\Models\DataMaster\MasterProduk;
 use App\Models\DataMaster\MasterSales;
 use App\Models\DataMaster\SalesOrder;
+use App\Models\MasterPiutang;
 use App\Models\SalesOrderItem;
 use Illuminate\Support\Str;
 use DataTables, validator, Hash, Auth;
@@ -18,6 +19,7 @@ class SalesOrderController extends Controller
 {
     public function index(Request $request)
     {
+       
         if ($request->ajax()) {
             $data = SalesOrder::with('customer', 'sales')->orderBy('id', 'DESC');
             // return $data;
@@ -74,10 +76,13 @@ class SalesOrderController extends Controller
         $no_invoice = 'INV-' . $tanggalInvoice->format('YmdHis') . '-' . rand(1000, 9999);
         $kodeSO = 'SO-' . rand(1000, 9999);
         $totalInvoice = 0;
-
+        $tanggalInvoicePiutang = date('YmdHis');
+        $no_invoicePiutang = 'PUT-' . $tanggalInvoicePiutang . '-' . mt_rand(1000, 9999);
         DB::beginTransaction(); // Mulai transaksi
 
         try {
+          
+
             // Simpan data sales order
             $salesOrder = new SalesOrder();
             $salesOrder->schedule_id = 1;
@@ -103,6 +108,23 @@ class SalesOrderController extends Controller
 
             $salesOrder->total_invoice = $totalInvoice; // Simpan total_invoice
             $salesOrder->save(); // Simpan sales order
+
+            $master_piutang = new MasterPiutang();
+            $master_piutang->customer_id = $request->cart[0]['customer_id'];
+            $master_piutang->kode_customer =  MasterCustomer::find($request->cart[0]['customer_id'])->kode_customer;
+            $master_piutang->nama_toko =  MasterCustomer::find($request->cart[0]['customer_id'])->nama_toko;
+            $master_piutang->sales_id = $sale->id_master_sales;
+            $master_piutang->kode_sales = $sale->kode_sales;
+            $master_piutang->so_id = $salesOrder->id;
+            $master_piutang->no_invoice =  $no_invoicePiutang;
+            $master_piutang->tanggal_invoice =  $request->cart[0]['tanggal_invoice'];
+            $master_piutang->due_date =  $request->cart[0]['tanggal_invoice'];
+            $master_piutang->total_invoice =$totalInvoice;
+            $master_piutang->jumlah_bayar =0;
+            $master_piutang->sisa_piutang = $totalInvoice;
+            $master_piutang->save();
+
+
 
             // Simpan setiap item ke dalam sales order items
             foreach ($request->cart as $item) {

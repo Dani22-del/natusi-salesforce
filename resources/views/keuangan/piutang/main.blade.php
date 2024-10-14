@@ -9,7 +9,7 @@
             <span class="text-muted fw-light">Keuangan /</span> Piutang
         </h4>
         <div class="main-page card p-3">
-            <div class="card-datatable text-nowrap p-3">
+            <div class="card-datatable text-nowrap p-3  table-responsive">
                 <div class="col-lg-3 col-sm-6 col-12 mb-4">
                     <div class="demo-inline-spacing">
                         <button type="button" onclick="addPiutang()" class="btn btn-sm btn-primary"><i
@@ -46,6 +46,89 @@
 @endsection
 
 @section('js')
+    <script>
+        $(function() {
+        var table = $('#datagrid').DataTable({
+            processing: true,
+            serverSide: true,
+            language: {
+                searchPlaceholder: "Ketikkan yang dicari"
+            },
+            ajax: "{{ route('piutang') }}",
+
+            columns: [{
+                    data: 'DT_RowIndex',
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 'customer',
+                    name: 'kode_customer',
+                    render: function(data, type, row) {
+                        return '<p style="color:black">' + data.kode_customer + '</p>';
+                    }
+                },
+                {
+                    data: 'customer',
+                    name: 'nama_toko',
+                    render: function(data, type, row) {
+                        return '<p style="color:black">' + data.nama_toko + '</p>';
+                    }
+                },
+                {
+                    data: 'so',
+                    name: 'no_invoice',
+                    render: function(data, type, row) {
+                        return '<p style="color:black">' + data.no_invoice + '</p>';
+                    }
+                },
+                {
+                    data: 'so',
+                    name: 'tanggal_invoice',
+                    render: function(data, type, row) {
+                        return '<p style="color:black">' + data.tanggal_invoice + '</p>';
+                    }
+                },
+                {
+                    data: 'sales',
+                    name: 'kode_sales',
+                    render: function(data, type, row) {
+                        return '<p style="color:black">' + data.kode_sales + '</p>';
+                    }
+                },
+                {
+                    data: 'sales',
+                    name: 'nama_lengkap',
+                    render: function(data, type, row) {
+                        return '<p style="color:black">' + data.nama_lengkap + '</p>';
+                    }
+                },
+                {
+                    data: 'so',
+                    name: 'total_invoice',
+                    render: function(data, type, row) {
+                        return '<p style="color:black">' + data.total_invoice + '</p>';
+                    }
+                },
+                {
+                    data: 'sisa_piutang',
+                    name: 'sisa_piutang',
+                    render: function(data, type, row) {
+                        return '<p style="color:black">' + data + '</p>';
+                    }
+                },
+               
+                
+                {
+                    data: 'action',
+                    name: 'action',
+                    orderable: false,
+                    searchable: false
+                },
+            ]
+        });
+        });
+    </script>
     <script>
         function loadCSS(href) {
             var link = document.createElement('link');

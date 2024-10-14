@@ -123,6 +123,9 @@ Route::group(['middleware' => 'auth'], function () {
         Route::group(['prefix' => 'pembayaran'], function () {
             Route::get('/', [PembayaranController::class, 'index'])->name('pembayaran');
             Route::post('/add-pembayaran', [PembayaranController::class, 'createPembayaran'])->name('form-add-pembayaran');
+            Route::post('/store-pembayaran', [PembayaranController::class, 'store'])->name('store-pembayaran');
+            Route::post('/delete-pembayaran', [PembayaranController::class, 'destroy'])->name('destroy-pembayaran');
+            Route::get('/pembayaran/print/{id}', [PembayaranController::class, 'printForm'])->name('print-form');
         });
     });
 
