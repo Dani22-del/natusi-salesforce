@@ -8,6 +8,7 @@
     <div class="row gy-4">
         <h4 class="fw-bold mb-2 py-3">
             <span class="text-muted fw-light">Keuangan /</span> {{ $data['title'] }}
+            
         </h4>
         <div class="main-page card p-3">
             <div class="card-datatable text-nowrap p-3 table-responsive">

@@ -20,7 +20,7 @@ class ProdukController extends Controller
   public function index(Request $request)
   {
     // return view('data-master.data_produk.main');
-    // return MasterProduk::with('principle', 'gudang', 'satuan.master_satuan')->get();
+    // return MasterProduk::with('principle', 'gudang','satuan.master_satuan')->where('id_master_produk',9)->get();
     if ($request->ajax()) {
       $data = MasterProduk::with('principle', 'gudang')
         ->orderBy('id_master_produk', 'DESC')

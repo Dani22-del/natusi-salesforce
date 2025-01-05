@@ -2,6 +2,7 @@
 @section('css')
 @endsection
 @section('content')
+
 <div class="row gy-4">
   <div class="col-12 col-xl-4">
     <div class="card p-2">
