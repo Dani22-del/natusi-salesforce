@@ -31,8 +31,6 @@
                             @foreach ($gudang as $item)
                                 <option value="{{ $item->id_master_gudang }}">{{ $item->nama_gudang }}</option>
                             @endforeach
-                            {{-- <option value="Australia">Australia</option>
-                <option value="Bangladesh">Bangladesh</option> --}}
                         </select>
                         <label for="gudang">Gudang</label>
                     </div>
